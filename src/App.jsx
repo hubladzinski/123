@@ -1,6 +1,7 @@
 import ChromeDinoGame from "react-chrome-dino";
 import "./App.css";
 import gaze from "./utils";
+import { useState, useEffect } from "react";
 
 function jump() {
   var e = new Event("keydown");
@@ -9,6 +10,7 @@ function jump() {
 }
 
 const App = () => {
+  const [initialized, setInitialized] = useState(false);
   const setup = async () => {
     const videoElement = document.querySelector("#video");
     await gaze.loadModel();
@@ -27,6 +29,17 @@ const App = () => {
     requestAnimationFrame(predict);
   };
 
+  useEffect(() => {
+    const handleSetup = async () => {
+      await setup();
+      predict();
+    };
+    if (!initialized) {
+      handleSetup();
+      setInitialized(false);
+    }
+  }, []);
+
   return (
     <div>
       <video
@@ -34,14 +47,11 @@ const App = () => {
         style={{
           transform: "scaleX(-1)",
           visibility: "hidden",
-          width: "auto",
-          height: "auto",
-          display: "auto",
+          width: "0",
+          height: "0",
+          display: "none",
         }}
       ></video>
-      <button onClick={setup}>Setup all</button>
-      <button onClick={predict}>Start prediction</button>
-      <button onClick={jump}>JUMP</button>
       <div style={{ width: "600px", height: "600px" }}>
         <ChromeDinoGame />
       </div>
